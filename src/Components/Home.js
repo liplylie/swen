@@ -4,6 +4,7 @@ import {
     Text,
     TouchableOpacity,
     FlatList,
+    Image,
     ScrollView,
     Platform,
     PermissionsAndroid,
@@ -13,6 +14,12 @@ import {
     KeyboardAvoidingView
 } from "react-native";
 import { Actions } from "react-native-router-flux";
+import axios from "axios";
+import { connect } from "react-redux";
+import * as secret from "../../sensitive.json";
+import countrySelectActions from "../Actions/countrySelectActions";
+import  { Convert } from "../styles";
+import SvgImage from "react-native-svg-image"
 
 const { height, width } = Dimensions.get("window");
 
@@ -29,29 +36,107 @@ const styles = {
     },
     row: {
         flexDirection: "row"
-    }
+    },
+    scroll: {
+        flexWrap: 'wrap',
+        alignItems: 'flex-start',
+        flexDirection: 'row',
+    },
 }
 
-export default class Home extends Component {
+class UnconnectedHome extends Component {
     // static propTypes = {
     //     selectCountry: propTypes.object,
     // };
 
+    async componentWillMount(){
+        console.log(this.props, "home props")
+        const { dispatch } = this.props
 
-    renderFlatListItem = (index, item) => {
-        console.log("item: ", item);
+        // get data from fixer io
 
-        return <View key={index} style={[styles.row, styles.flatListItem]}>
+        let data = await axios.get(`http://data.fixer.io/api/latest?access_key=${secret.apiKey}`);
+
+        for (key in data.data.rates) {
+           // attach flag to rates object
+            try {
+                let flag = await axios.get(`https://restcountries.eu/rest/v2/currency/${key}`);
+                let send = Object.assign({}, { currency: data.data.rates[key], flag: flag.data[0].flag})
+                data.data.rates[key] = send
+            }
+            catch(err){
+                continue
+            }
+           
+        }
+        
+        dispatch(countrySelectActions.setBaseCurrency(data.data.base));
+        console.log(data.data.rates, "rates bro")
+        dispatch(countrySelectActions.setRates(data.data.rates));
+       
+
+
+    }
+
+
+    renderFlatListItem = item => {
+       console.log("item: ", item);
+        if (!item){
+            return null
+        }
+
+        // get the flags for currencies that contain flags
+        let flag = item[1].flag || null;
+        let currency = item[1].currency || item[1];
+
+        let icon = () => {
+            if (flag) {
+                console.log(flag,"flag")
+                return (
+                    <View style={{flex: 1}}>
+                    <SvgImage
+                            source={{uri:flag}}
+                        style={{
+                            width: Convert(30),
+                            height: Convert(20),
+                            marginTop: Convert(10),
+                            marginLeft: Convert(5)
+
+                        }}/>
+                        </View>
+                )     
+            } else {
+                return (
+                <Text style={{ marginLeft: Convert(5) }}>
+                    {item[0]}
+                  </Text>
+                )
+            }
+            
+        }
+        
+
+        return (
+        <View style={[styles.scroll, styles.flatListItem]}>
             <View>
-              <TouchableOpacity onPress={()=>Actions.Converter({country: item})}>
-                <Text>{item}</Text>
+              <TouchableOpacity style={{ flexDirection: "row", flex: 1, alignItems: "center" }} onPress={() => Actions.Converter(
+                    { country: item[0], rate: currency, flag: flag }
+                  )}>
+                {icon()}
+                <Text style={{ left: flag ? width - 100 : width - 130 }}>
+                  {Math.round(currency * 100) / 100}
+                </Text>
               </TouchableOpacity>
             </View>
-          </View>;
+          </View>
+        )
     }
+
     render() {
-        const data = ["one", "two", "three"]
-        return <View style={{ display: "flex", flexDirection: "column", flex: 1, backgroundColor: "red" }}>
+        const { rates } = this.props.country
+        const data = Object.entries(rates)
+        console.log(this.props.country, "country")
+        return <View style={{ display: "flex", flexDirection: "column", flex: 1 }}>
             <View style={{ flex: 1, backgroundColor: "cornflowerblue", alignItems: "center", justifyContent: "center" }}>
                 <TouchableOpacity onPress={()=> {Actions.CountrySelect()}}>
                     <View style={{ height: 40, width: 80, backgroundColor: "white", justifyContent: "center", alignItems: "center" }}>
@@ -64,9 +149,16 @@ export default class Home extends Component {
                 <FlatList
                     style={styles.flatList}
                     data={data}
-                    renderItem={({ index, item }) => this.renderFlatListItem(index, item)}
+                    renderItem={({ item }) => this.renderFlatListItem(item)}
                 />
             </View>
           </View>;
     }
 }
+
+
+const Home = connect(state => ({
+    country: state.country
+}))(UnconnectedHome);
+
+export default Home ;

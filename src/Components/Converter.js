@@ -9,8 +9,9 @@ import {
     Alert,
     KeyboardAvoidingView
 } from "react-native";
+import { connect } from "react-redux";
 
-export default class Converter extends Component {
+class UnconnectedConverter extends Component {
     // static propTypes = {
     //     selectCountry: propTypes.object,
     // };
@@ -19,9 +20,15 @@ export default class Converter extends Component {
     }
     render() {
         return (
-            <View>
-                <Text>Converter</Text>
+            <View style={{display: "flex", flex: 1, justifyContent: "center", alignItems: "center"}}>
+                <Text>{this.props.country}</Text>
             </View>
         );
     }
 }
+
+const Converter = connect(state => ({
+    rate: state.rate
+}))(UnconnectedConverter);
+
+export default Converter;
