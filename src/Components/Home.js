@@ -18,37 +18,15 @@ import axios from "axios";
 import { connect } from "react-redux";
 import * as secret from "../../sensitive.json";
 import countrySelectActions from "../Actions/countrySelectActions";
-import  { Convert } from "../styles";
+import  { Convert, Styles } from "../styles";
 import SvgImage from "react-native-svg-image"
 import propTypes from "prop-types"
 
 const { height, width } = Dimensions.get("window");
 
-const styles = {
-    flatListItem: {
-        height: height >= 667 ? height * 0.08 : height * 0.1,
-        alignItems: "center",
-        borderBottomWidth: 1,
-        borderColor: "gray"
-    },
-    flatList: {
-        // marginVertical: height * 0.01,
-        marginVertical: 0
-    },
-    row: {
-        flexDirection: "row"
-    },
-    scroll: {
-        flexWrap: 'wrap',
-        alignItems: 'flex-start',
-        flexDirection: 'row',
-    },
-}
-
 class UnconnectedHome extends Component {
     static propTypes = {
         country: propTypes.object,
-        dispatch: propTypes.object,
     };
 
 
@@ -73,14 +51,11 @@ class UnconnectedHome extends Component {
 
         dispatch(countrySelectActions.setBaseCurrency(data.data.base));
         dispatch(countrySelectActions.setRates(data.data.rates));
-       
-
-
     }
 
 
     renderFlatListItem = item => {
-       console.log("item: ", item);
+       //console.log("item: ", item);
         if (!item){
             return null
         }
@@ -93,13 +68,13 @@ class UnconnectedHome extends Component {
             if (flag) {
                 return (
                     <View style={{flexDirection: "row", alignItems: "center", flex:1 }}>
-                        <View style={{ flex:0.4}}>
+                        <View style={{ flex:0.8}}>
                             <SvgImage
                                 source={{ uri: flag }}
                                 style={{
                                     width: Convert(30),
                                     marginTop: Convert(10),
-                                    marginLeft: Convert(5)
+                                    marginLeft: Convert(5),
                                 }}
                             />
                         </View>
@@ -112,9 +87,12 @@ class UnconnectedHome extends Component {
                 )     
             } else {
                 return (
-                <Text style={{ marginLeft: Convert(5) }}>
-                    {item[0]}
-                  </Text>
+                    <View style= {{flex: 1}}>
+                        <Text style={{ left: Convert(42) }}>
+                            {item[0]}
+                        </Text>
+                    </View>
+                    
                 )
             }
             
@@ -122,25 +100,25 @@ class UnconnectedHome extends Component {
         
 
         return (
-        <View style={[styles.scroll, styles.flatListItem]}>
-            <View style={{flex:2}}>
-              <TouchableOpacity style={{ flexDirection: "row", flex: 2, alignItems: "center" }} onPress={() => Actions.Converter(
-                    { country: item[0], rate: currency, flag: flag }
-                  )}>
-                {icon()}
-                <Text style={{ flex: 1,left: flag ? width - 275 : width - 117 }}>
-                  {Math.round(currency * 100) / 100}
-                </Text>
-              </TouchableOpacity>
+            <View style={[Styles.scroll, Styles.flatListItem]}>
+                <View style={{flex:1}}>
+                <TouchableOpacity style={{ flexDirection: "row", flex: 1, alignItems: "center" }} onPress={() => Actions.Converter(
+                        { country: item[0], rate: currency, flag: flag }
+                    )}>
+                    {icon()}
+                    <View style={{flex:1.5}}></View>
+                    <Text style={{ flex: 1 }}>
+                    {Math.round(currency * 100) / 100}
+                    </Text>
+                </TouchableOpacity>
+                </View>
             </View>
-          </View>
         )
     }
 
     render() {
-        const { rates } = this.props.country
+        const { rates, baseCurrency } = this.props.country
         const data = Object.entries(rates)
-        console.log(this.props.country, "country")
         return (
             <View style={{ display: "flex", flexDirection: "column", flex: 1 }}>
                 <View style={{ flex: 1, backgroundColor: "cornflowerblue", alignItems: "center", justifyContent: "center" }}>
@@ -154,7 +132,7 @@ class UnconnectedHome extends Component {
                                     marginRight: 3
                                 }}
                             />
-                            <Text>{this.props.country.baseCurrency}</Text>
+                            <Text>{baseCurrency}</Text>
 
                         </View>
                     </TouchableOpacity>
@@ -162,7 +140,7 @@ class UnconnectedHome extends Component {
                 </View>
                 <View style={{ flex: 8, backgroundColor: "white" }}>
                     <FlatList
-                        style={styles.flatList}
+                        style={Styles.flatList}
                         data={data}
                         renderItem={({ item }) => this.renderFlatListItem(item)}
                     />

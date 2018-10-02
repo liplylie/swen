@@ -1,0 +1,1 @@
+redux architecture - I used this architecture because if I were to expand on this app, it would be much easier to control internal state using redux.

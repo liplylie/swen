@@ -12,3 +12,24 @@ export const Convert = dp => {
     }
     return dp * 0.93;
 };
+
+export const Styles = StyleSheet.create({
+  flatListItem: {
+    height: height >= 667 ? height * 0.08 : height * 0.1,
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderColor: "gray"
+  },
+  flatList: {
+    // marginVertical: height * 0.01,
+    marginVertical: 0
+  },
+  row: {
+    flexDirection: "row"
+  },
+  scroll: {
+    flexWrap: "wrap",
+    alignItems: "flex-start",
+    flexDirection: "row"
+  }
+})

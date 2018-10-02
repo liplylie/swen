@@ -23,9 +23,9 @@ export default class App extends React.Component {
             />
             <Scene
               key={"CountrySelect"}
+              title="Country Select"
               component={CountrySelect}
-              hideNavBar
-              type={ActionConst.RESET}
+              type={ActionConst.PUSH}
               
             />
             <Scene
