@@ -52,9 +52,9 @@ class UnconnectedConverter extends Component {
     render() {
         return (
         <KeyboardAvoidingView style={{ display: "flex", flex: 1, flexDirection: "column", backgroundColor: "cornflowerblue" }}>
-            <View style={{ borderStyle: "solid", borderBottomWidth: 1, borderBottomColor: "lightgray", flexDirection: "row", paddingTop: Convert(20), flex: 1, justifyContent: "space-around", backgroundColor: "white" }}>
+            <View style={{ borderStyle: "solid", borderBottomWidth: 1, borderBottomColor: "lightgray", flexDirection: "row", flex: 1, justifyContent: "space-around", alignItems: "center", backgroundColor: "white" }}>
              <TextInput 
-                style={{ height: Convert(40), width: Convert(40),fontSize:Convert(40) }} 
+                style={{ width: Convert(40), fontSize:Convert(40) }} 
                 onChangeText={text => this.handleConvert(text)} 
                 value={`${this.state.baseAmount}`} 
                 ref={ref => this.textInputRef = ref}

@@ -37,17 +37,20 @@ class UnconnectedHome extends Component {
         // get data from fixer io
 
         let data = await axios.get(`http://data.fixer.io/api/latest?access_key=${secret.apiKey}`);
-        for (key in data.data.rates) {
-           // attach flag url to rates object
-            try {
-                let flag = await axios.get(`https://restcountries.eu/rest/v2/currency/${key}`);
-                let send = Object.assign({}, { currency: data.data.rates[key], flag: flag.data[0].flag})
-                data.data.rates[key] = send
-            }
-            catch(err){
-                continue
+        if (Platform.OS === "ios"){
+            for (key in data.data.rates) {
+                // attach flag url to rates object
+                try {
+                    let flag = await axios.get(`https://restcountries.eu/rest/v2/currency/${key}`);
+                    let send = Object.assign({}, { currency: data.data.rates[key], flag: flag.data[0].flag })
+                    data.data.rates[key] = send
+                }
+                catch (err) {
+                    continue
+                }
             }
         }
+       
 
         dispatch(countrySelectActions.setBaseCurrency(data.data.base));
         dispatch(countrySelectActions.setRates(data.data.rates));
@@ -65,7 +68,7 @@ class UnconnectedHome extends Component {
         let currency = item[1].currency || item[1];
 
         let icon = () => {
-            if (flag) {
+            if (flag && Platform.OS === "ios") {
                 return (
                     <View style={{flexDirection: "row", alignItems: "center", flex:1 }}>
                         <View style={{ flex:0.8}}>
