@@ -31,7 +31,6 @@ class UnconnectedHome extends Component {
 
 
     async componentWillMount(){
-        console.log(this.props, "home props")
         const { dispatch } = this.props
 
         // get data from fixer io
